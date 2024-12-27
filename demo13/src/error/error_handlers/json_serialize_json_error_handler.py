@@ -1,7 +1,8 @@
-import logging
 import json
-from .error_handler import ErrorHandler
+import logging
+
 from ..errors import JsonSerializeError
+from .error_handler import ErrorHandler
 
 
 class JsonSerializeJsonErrorHandler(ErrorHandler):

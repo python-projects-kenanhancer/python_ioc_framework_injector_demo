@@ -1,7 +1,8 @@
 import json
 import logging
-from .error_handler import ErrorHandler
+
 from ..errors import DatabaseFetchError
+from .error_handler import ErrorHandler
 
 
 class DatabaseJsonErrorHandler(ErrorHandler):
@@ -10,6 +11,6 @@ class DatabaseJsonErrorHandler(ErrorHandler):
             "error_type": "DatabaseError",
             "message": str(error),
             "error_code": error.error_code,
-            "query": error.query
+            "query": error.query,
         }
         logging.error(json.dumps(error_info))

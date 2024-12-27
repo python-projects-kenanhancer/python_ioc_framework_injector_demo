@@ -1,5 +1,5 @@
-from injector import Module, provider, Injector, singleton
 from app_config import AppConfig
+from injector import Module, provider, singleton
 
 
 class ConfigurationModule(Module):

@@ -1,0 +1,29 @@
+{
+  "python.defaultInterpreterPath": "${workspaceFolder}/.venv/bin/python",
+  "python.experiments.enabled": false,
+  "python.analysis.inlayHints.functionReturnTypes": true,
+  "python.analysis.inlayHints.pytestParameters": true,
+  "python.analysis.inlayHints.variableTypes": true,
+  "python.analysis.inlayHints.callArgumentNames": "all",
+  "python.analysis.typeCheckingMode": "basic", // Enable strict type checking
+  "python.analysis.diagnosticMode": "workspace", // Analyze all files in the workspace
+  "python.analysis.autoSearchPaths": true, // Automatically search for imports
+  "python.analysis.useLibraryCodeForTypes": true, // Include library code in analysis
+  "python.analysis.autoImportCompletions": true,
+  "isort.args": ["--profile", "black"],
+  "files.watcherExclude": {
+    "**/.git/**": true, // Exclude version control metadata (Git repository files)
+    "**/.pytest_cache/**": true, // Exclude pytest cache directory
+    "**/__pycache__/**": true, // Exclude Python bytecode cache directories
+    "**/.venv/**": true // Exclude the Python virtual environment directory (.venv)
+  },
+  "[python]": {
+    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.formatOnSave": true,
+    "editor.codeActionsOnSave": {
+      "source.organizeImports": "always",
+      "source.unusedImports": "always",
+      "source.fixAll": "always"
+    }
+  },
+}

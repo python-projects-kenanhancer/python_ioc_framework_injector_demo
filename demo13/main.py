@@ -2,13 +2,13 @@ import logging
 
 from src.application import EventApplication
 from src.error import configure_error_handlers
-from src.repositories import Repository, DatabaseRepository
+from src.repositories import DatabaseRepository, Repository
 from src.serializers import Serializer, XmlSerializer
-from src.services import ServiceClient, EventServiceClient
+from src.services import EventServiceClient, ServiceClient
 
 logging.basicConfig(level=logging.INFO)
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     repository: Repository = DatabaseRepository()
     serializer: Serializer = XmlSerializer()
     service_client: ServiceClient = EventServiceClient()

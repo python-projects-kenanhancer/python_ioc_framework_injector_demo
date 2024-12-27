@@ -1,11 +1,17 @@
 import logging
+
 from ..repositories import Repository
 from ..serializers import Serializer
 from ..services import ServiceClient
 
 
 class EventApplication:
-    def __init__(self, repository: Repository, serializer: Serializer, service_client: ServiceClient):
+    def __init__(
+        self,
+        repository: Repository,
+        serializer: Serializer,
+        service_client: ServiceClient,
+    ):
         self.repository = repository
         self.serializer = serializer
         self.service_client = service_client

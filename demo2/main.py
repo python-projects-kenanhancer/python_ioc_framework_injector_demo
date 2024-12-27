@@ -10,5 +10,5 @@ config = Config(
     AUTH_TOKEN_SCOPE="scope",
 )
 
-if __name__ == '__main__':
-    print(config.dict())
+if __name__ == "__main__":
+    print(config.model_dump())

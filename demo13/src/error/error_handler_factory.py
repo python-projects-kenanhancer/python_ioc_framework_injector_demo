@@ -7,7 +7,9 @@ class ErrorHandlerFactory:
     def __init__(self):
         self.error_handlers = {}
 
-    def register_handler(self, error_type: type[Exception], error_handler: ErrorHandler):
+    def register_handler(
+        self, error_type: type[Exception], error_handler: ErrorHandler
+    ):
         self.error_handlers[error_type] = error_handler
 
     def get_handler(self, error_type) -> ErrorHandler:

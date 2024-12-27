@@ -1,5 +1,6 @@
 from .repository import Repository
-from ..error.errors import DatabaseFetchError
+
+# from ..error.errors import DatabaseFetchError
 
 
 class DatabaseRepository(Repository):

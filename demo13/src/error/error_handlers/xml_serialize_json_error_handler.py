@@ -1,7 +1,8 @@
 import json
 import logging
-from .error_handler import ErrorHandler
+
 from ..errors import XmlSerializeError
+from .error_handler import ErrorHandler
 
 
 class XmlSerializeJsonErrorHandler(ErrorHandler):
@@ -10,6 +11,6 @@ class XmlSerializeJsonErrorHandler(ErrorHandler):
             "error_type": "XmlSerializationError",
             "message": str(error),
             "detail": error.detail,
-            "element": error.element
+            "element": error.element,
         }
         logging.error(json.dumps(error_info))

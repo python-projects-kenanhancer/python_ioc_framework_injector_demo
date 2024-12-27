@@ -1,5 +1,5 @@
-import logging
 import json
+import logging
 from abc import ABC, abstractmethod
 
 logging.basicConfig(level=logging.INFO)
@@ -41,7 +41,9 @@ class Serializer(ABC):
 class DatabaseRepository(Repository):
     def find_all(self):
         # return {"name": "John Doe", "email": "john@example.com"}
-        raise DatabaseFetchError("Failed to fetch data from database", 5001, "SELECT * FROM users")
+        raise DatabaseFetchError(
+            "Failed to fetch data from database", 5001, "SELECT * FROM users"
+        )
 
 
 class XmlSerializer(Serializer):
@@ -49,7 +51,9 @@ class XmlSerializer(Serializer):
 
     def serialize(self, data):
         if not data:
-            raise XmlSerializeError("XML serialization failed", "Missing closing tag", self.element)
+            raise XmlSerializeError(
+                "XML serialization failed", "Missing closing tag", self.element
+            )
         return f"<data><name>{data['name']}</name><email>{data['email']}</email></data>"
 
 
@@ -65,17 +69,23 @@ class EventServiceClient(ServiceClient):
 
     def call(self, data):
         if not data:
-            raise EventServiceError("Failed to connect to service", self.service_name, self.endpoint)
+            raise EventServiceError(
+                "Failed to connect to service", self.service_name, self.endpoint
+            )
         logging.info(f"Calling event service with data: {data}")
         return "<Response><Status>Success</Status></Response>"
 
 
 def handle_database_error_text(e: DatabaseFetchError):
-    logging.error(f"Database error occurred: {e}. Error code: {e.error_code}. Query: {e.query}")
+    logging.error(
+        f"Database error occurred: {e}. Error code: {e.error_code}. Query: {e.query}"
+    )
 
 
 def handle_serialize_error_text(e: XmlSerializeError):
-    logging.error(f"Serialization error occurred: {e}. Detail: {e.detail}. Element: {e.element}")
+    logging.error(
+        f"Serialization error occurred: {e}. Detail: {e.detail}. Element: {e.element}"
+    )
 
 
 def handle_event_service_error_text(e: EventServiceError):
@@ -91,7 +101,7 @@ def handle_database_error_json(e: DatabaseFetchError):
         "error_type": "DatabaseError",
         "message": str(e),
         "error_code": e.error_code,
-        "query": e.query
+        "query": e.query,
     }
     logging.error(json.dumps(error_info))
 
@@ -101,7 +111,7 @@ def handle_serialize_error_json(e: XmlSerializeError):
         "error_type": "SerializationError",
         "message": str(e),
         "detail": e.detail,
-        "element": e.element
+        "element": e.element,
     }
     logging.error(json.dumps(error_info))
 
@@ -111,21 +121,23 @@ def handle_event_service_error_json(e: EventServiceError):
         "error_type": "EventServiceError",
         "message": str(e),
         "service_name": e.service_name,
-        "endpoint": e.endpoint
+        "endpoint": e.endpoint,
     }
     logging.error(json.dumps(error_info))
 
 
 def handle_general_error_json(e: Exception):
-    error_info = {
-        "error_type": "GeneralError",
-        "message": str(e)
-    }
+    error_info = {"error_type": "GeneralError", "message": str(e)}
     logging.error(json.dumps(error_info))
 
 
 class Application:
-    def __init__(self, repository: Repository, serializer: Serializer, service_client: ServiceClient):
+    def __init__(
+        self,
+        repository: Repository,
+        serializer: Serializer,
+        service_client: ServiceClient,
+    ):
         self.repository = repository
         self.serializer = serializer
         self.service_client = service_client
@@ -137,7 +149,7 @@ class Application:
         logging.info(f"Response from service: {response}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     repository: Repository = DatabaseRepository()
     serializer: Serializer = XmlSerializer()
     service_client: ServiceClient = EventServiceClient()
@@ -145,7 +157,7 @@ if __name__ == '__main__':
         DatabaseFetchError: handle_database_error_json,
         XmlSerializeError: handle_serialize_error_text,
         EventServiceError: handle_event_service_error_text,
-        Exception: handle_general_error_text  # General errors handler
+        Exception: handle_general_error_text,  # General errors handler
     }
     app = Application(repository, serializer, service_client)
 

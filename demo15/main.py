@@ -31,7 +31,8 @@ class IoCContainer:
 
 
 def inject(constructor):
-    from inspect import signature, Parameter
+    from inspect import Parameter, signature
+
     sig = signature(constructor)
 
     def wrapper(*args, **kwargs):
@@ -40,7 +41,9 @@ def inject(constructor):
 
         new_args = list(bound.args)
         for name, param in sig.parameters.items():
-            if param.annotation is not Parameter.empty and isinstance(param.annotation, type):
+            if param.annotation is not Parameter.empty and isinstance(
+                param.annotation, type
+            ):
                 if name in bound.arguments:
                     # Resolve only if the type is a class and needs to be instantiated
                     bound.arguments[name] = container.resolve(param.annotation)
@@ -77,7 +80,7 @@ def post_instantiation_hook(instance):
     print(f"Instance of {instance.__class__.__name__} created with id {id(instance)}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     container = IoCContainer()
 
     # Set up hooks

@@ -1,6 +1,7 @@
-from pydantic import BaseModel, Field, HttpUrl
-from typing import Optional
 from enum import Enum
+from typing import Optional
+
+from pydantic import BaseModel, Field, HttpUrl
 
 
 class Environment(str, Enum):
@@ -22,8 +23,12 @@ class Config(BaseModel):
     AUTH_TOKEN_CACHE_TTL: int = Field(default=3600)
     GET_OFFERS_PATH: str = Field(default="/api/events/{partyId}")
     GET_EVENT_BY_ID_PATH: str = Field(default="/api/events/{partyId}/{resourceId}")
-    ROUTING_SERVICE_GET_BROKER_DATA_PATH: str = Field(default="/api/brokers?client_uuid={clientId}")
-    ROUTING_SERVICE_GET_VISIBLE_PARTIES_PATH: str = Field(default="/api/insurers/{productUuid}?brokerUuid={brokerUuid}")
+    ROUTING_SERVICE_GET_BROKER_DATA_PATH: str = Field(
+        default="/api/brokers?client_uuid={clientId}"
+    )
+    ROUTING_SERVICE_GET_VISIBLE_PARTIES_PATH: str = Field(
+        default="/api/insurers/{productUuid}?brokerUuid={brokerUuid}"
+    )
     ROUTING_SERVICE_GET_PRODUCTS_PATH: str = Field(default="/api/products")
     ROUTING_SERVICE_SUBSCRIPTION_PATH: str = Field(default="/api/subscriptions")
     SUBMISSION_TOPIC: str = Field(default="")

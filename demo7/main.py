@@ -56,7 +56,12 @@ class EventServiceClient(ServiceClient):
 
 
 class Application:
-    def __init__(self, repository: Repository, serializer: Serializer, service_client: ServiceClient):
+    def __init__(
+        self,
+        repository: Repository,
+        serializer: Serializer,
+        service_client: ServiceClient,
+    ):
         self.repository = repository
         self.serializer = serializer
         self.service_client = service_client
@@ -68,7 +73,7 @@ class Application:
         logging.info(f"Response from service: {response}")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     repository: Repository = DatabaseRepository()
     serializer: Serializer = XmlSerializer()
     service_client: ServiceClient = EventServiceClient()

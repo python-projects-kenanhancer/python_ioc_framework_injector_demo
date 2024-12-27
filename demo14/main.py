@@ -15,7 +15,9 @@ def log_method_calls(func):
         result = func(*args, **kwargs)
         end_time = time.time()
         duration = end_time - start_time
-        logging.info(f"END Method: {func.__name__} Result:{result} Duration:{duration:.3f}")
+        logging.info(
+            f"END Method: {func.__name__} Result:{result} Duration:{duration:.3f}"
+        )
         return result
 
     return wrapper
@@ -38,7 +40,7 @@ def handle_errors(func):
 def logger(cls):
     """Class decorator that applies logging to all methods."""
     for name, method in cls.__dict__.items():
-        if callable(method) and not name.startswith('__'):
+        if callable(method) and not name.startswith("__"):
             setattr(cls, name, log_method_calls(method))
     return cls
 
@@ -46,7 +48,7 @@ def logger(cls):
 def error(cls):
     """Class decorator that applies error handling to all methods."""
     for name, method in cls.__dict__.items():
-        if callable(method) and not name.startswith('__'):
+        if callable(method) and not name.startswith("__"):
             setattr(cls, name, handle_errors(method))
     return cls
 
@@ -71,7 +73,7 @@ class EnglishGreeting:
         return f"Goodbye, {self.greeting_helper.get_full_name(first_name, last_name)}!"
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     greeting_helper = GreetingHelper()
     greeter = EnglishGreeting(greeting_helper)
     logging.info(greeter.say_hello("John", "John"))

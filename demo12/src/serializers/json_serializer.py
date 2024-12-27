@@ -1,6 +1,7 @@
 import json
-from .serializer import Serializer
+
 from ..error.errors import JsonSerializeError
+from .serializer import Serializer
 
 
 class JsonSerializer(Serializer):

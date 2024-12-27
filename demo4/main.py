@@ -1,5 +1,5 @@
-import logging
 import json
+import logging
 from abc import ABC, abstractmethod
 
 logging.basicConfig(level=logging.INFO)
@@ -57,7 +57,12 @@ class EventServiceClient(ServiceClient):
 
 
 class Application:
-    def __init__(self, repository: Repository, serializer: Serializer, service_client: ServiceClient):
+    def __init__(
+        self,
+        repository: Repository,
+        serializer: Serializer,
+        service_client: ServiceClient,
+    ):
         self.repository = repository
         self.serializer = serializer
         self.service_client = service_client
@@ -66,10 +71,14 @@ class Application:
         records = self.repository.find_all()
         serialized_data = self.serializer.serialize(records)
         response = self.service_client.call(serialized_data)
-        logging.info(json.dumps({"message": "Response received from service", "response": response}))
+        logging.info(
+            json.dumps(
+                {"message": "Response received from service", "response": response}
+            )
+        )
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     repository: Repository = DatabaseRepository()
     serializer: Serializer = XmlSerializer()
     service_client: ServiceClient = EventServiceClient()
@@ -78,10 +87,18 @@ if __name__ == '__main__':
     try:
         app.run()
     except DatabaseFetchError as db_error:
-        logging.error(json.dumps({"errors": "Database fetch errors", "details": str(db_error)}))
+        logging.error(
+            json.dumps({"errors": "Database fetch errors", "details": str(db_error)})
+        )
     except XmlSerializeError as sr_error:
-        logging.error(json.dumps({"errors": "Serialization errors", "details": str(sr_error)}))
+        logging.error(
+            json.dumps({"errors": "Serialization errors", "details": str(sr_error)})
+        )
     except EventServiceError as svc_error:
-        logging.error(json.dumps({"errors": "Event service call errors", "details": str(svc_error)}))
+        logging.error(
+            json.dumps(
+                {"errors": "Event service call errors", "details": str(svc_error)}
+            )
+        )
     except Exception as ex:
         logging.error(json.dumps({"errors": "General errors", "details": str(ex)}))

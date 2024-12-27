@@ -1,5 +1,5 @@
-from .serializer import Serializer
 from ..error.errors import XmlSerializeError
+from .serializer import Serializer
 
 
 class XmlSerializer(Serializer):
@@ -7,5 +7,7 @@ class XmlSerializer(Serializer):
 
     def serialize(self, data):
         if not data:
-            raise XmlSerializeError("XML serialization failed", "Missing closing tag", self.element)
+            raise XmlSerializeError(
+                "XML serialization failed", "Missing closing tag", self.element
+            )
         return f"<data><name>{data['name']}</name><email>{data['email']}</email></data>"

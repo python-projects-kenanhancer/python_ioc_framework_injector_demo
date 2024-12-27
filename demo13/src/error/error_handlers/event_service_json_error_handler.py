@@ -1,7 +1,8 @@
 import json
 import logging
-from .error_handler import ErrorHandler
+
 from ..errors import EventServiceError
+from .error_handler import ErrorHandler
 
 
 class EventServiceJsonErrorHandler(ErrorHandler):
@@ -10,6 +11,6 @@ class EventServiceJsonErrorHandler(ErrorHandler):
             "error_type": "EventServiceError",
             "message": str(error),
             "service_name": error.service_name,
-            "endpoint": error.endpoint
+            "endpoint": error.endpoint,
         }
         logging.error(json.dumps(error_info))

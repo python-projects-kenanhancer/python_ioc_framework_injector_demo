@@ -1,10 +1,9 @@
-from injector import Injector
-
 from configuration_module import ConfigurationModule
 from database_service import DatabaseService
-from demo1.greeting_service import GreetingService
+from greeting_service import GreetingService
+from injector import Injector
 
-if __name__ == '__main__':
+if __name__ == "__main__":
     injector = Injector([ConfigurationModule()])
     database_service = injector.get(DatabaseService)
     database_service.connect()
