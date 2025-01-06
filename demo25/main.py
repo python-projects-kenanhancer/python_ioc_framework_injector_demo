@@ -106,12 +106,12 @@ class GreetingModule(Module):
 
 
 if __name__ == "__main__":
-    config = AppConfig(
-        database_url="mysql://localhost:3306/mydb",
-        enable_feature_x=True,
-        enable_feature_y=False,
-        greeting_strategy=GreetingType.HOLIDAY,
-    )
+    # config = AppConfig(
+    #     database_url="mysql://localhost:3306/mydb",
+    #     enable_feature_x=True,
+    #     enable_feature_y=False,
+    #     greeting_strategy=GreetingType.HOLIDAY,
+    # )
 
     injector = Injector(
         [GreetingModule, ConfigModule("my-bucket", "configs/app-config.json")]
