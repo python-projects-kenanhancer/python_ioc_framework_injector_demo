@@ -1,9 +1,12 @@
+import time
+
 from di import (
+    LogMiddleware,
+    TimeMiddleware,
     container_builder_middleware,
     inject_dependency_middleware,
     logger_middleware,
     pipeline,
-    pipeline_as_middleware,
     time_middleware,
     typed_request_middleware,
 )
@@ -11,21 +14,21 @@ from flask import Flask, request
 from greeting import AppConfig, GreetingHttpRequest, GreetingService
 from injector import Injector
 
+shared_pipeline = pipeline(container_builder_middleware, LogMiddleware, TimeMiddleware)
 
-@pipeline(logger_middleware, time_middleware)
+
+@pipeline(shared_pipeline)
 class Foo:
     def do_something(self, x: int, y: int) -> int:
         print(f"Inside do_something: x={x}, y={y}")
         return x + y
 
     def long_operation(self) -> str:
-        import time
-
         time.sleep(0.5)
         return "Finished operation"
 
 
-@pipeline(logger_middleware, time_middleware)  # only logs, for example
+@pipeline(shared_pipeline)
 def add_numbers(a: int, b: int) -> int:
     print(f"Inside add_numbers: a={a}, b={b}")
     return a + b
@@ -60,12 +63,13 @@ sub_pipeline = pipeline(logger_middleware, time_middleware)
     container_builder_middleware,
     inject_dependency_middleware,
     typed_request_middleware,
-    pipeline_as_middleware(sub_pipeline),
+    sub_pipeline,
 )
 def say_hello_ultimate_http_v2(
     request: GreetingHttpRequest,
     greeting_service: GreetingService,
     app_config: AppConfig,
+    **kwargs,
 ):
 
     print(app_config)
@@ -87,12 +91,13 @@ if __name__ == "__main__":
         method="POST",
         json={"first_name": "Jane", "last_name": "Smith"},
     ):
-        # say_hello_ultimate_http_v1(request)
+        say_hello_ultimate_http_v1(request)
         say_hello_ultimate_http_v2(request)
+        print()
 
-    # print(add_numbers(3, 4))
+    print(add_numbers(3, 4))
 
-    # f = Foo()
-    # result = f.do_something(2, 5)
-    # print("Got result:", result)
-    # print(f.long_operation())
+    f = Foo()
+    result = f.do_something(2, 5)
+    print("Got result:", result)
+    print(f.long_operation())

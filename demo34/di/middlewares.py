@@ -1,33 +1,71 @@
 import inspect
 from time import time
-from typing import Any, Callable
 
 from flask import Request
+from injector import inject
 
 from .build_di_container import build_di_container
 from .context import Context
+from .pipeline import Next
 
 
-def logger_middleware(context: Context, next_: Callable[[], Any]) -> Any:
+def logger_middleware(context: Context, next: Next):
     print(
         f"[LOGGER] About to call {context.func.__name__}"
         f" with args={context.args}, kwargs={context.kwargs}"
     )
-    result = next_()
+    result = next()
     print(f"[LOGGER] Finished {context.func.__name__}, result={result}")
     return result
 
 
-def time_middleware(context: Context, next_: Callable[[], Any]):
+def time_middleware(context: Context, next: Next):
     start = time()
     print("[TIME] Start timing...")
-    result = next_()
+    result = next()
     elapsed = time() - start
     print(f"[TIME] {context.func.__name__} took {elapsed:.4f}s")
     return result
 
 
-def typed_request_middleware(context: Context, next_: Callable[[], Any]):
+class Logger:
+    def log(self, msg: str):
+        print(msg)
+
+
+class LogMiddleware:
+    @inject
+    def __init__(self, logger: Logger):
+        self.logger = logger
+
+    def __call__(self, context: Context, next: Next):
+        self.logger.log(
+            f"[LOGGER] About to call {context.func.__name__}"
+            f" with args={context.args}, kwargs={context.kwargs}"
+        )
+        result = next()
+        self.logger.log(f"[LOGGER] Finished {context.func.__name__}, result={result}")
+        return result
+
+
+class TimeMiddleware:
+    @inject
+    def __init__(self, logger: Logger):
+        """
+        This constructor is where the DI framework will inject your dependencies.
+        """
+        self.logger = logger
+
+    def __call__(self, context: Context, next: Next):
+        start = time()
+        self.logger.log("[TIME] Start timing...")
+        result = next()
+        elapsed = time() - start
+        self.logger.log(f"[TIME] {context.func.__name__} took {elapsed:.4f}s")
+        return result
+
+
+def typed_request_middleware(context: Context, next: Next):
     """Middleware that replaces the first argument (Flask Request)
     with a typed model derived from the request content."""
 
@@ -91,7 +129,7 @@ def typed_request_middleware(context: Context, next_: Callable[[], Any]):
     context.args = new_args
 
     # 8. Call the next middleware or final function
-    result = next_()
+    result = next()
 
     # 9. If the result has a `.to_dict()`, convert to dict so Flask can return JSON
     #    (Only if you want that automatically.)
@@ -101,16 +139,7 @@ def typed_request_middleware(context: Context, next_: Callable[[], Any]):
     return result
 
 
-def inject_dependency_middleware(context: Context, next_: Callable[[], Any]) -> Any:
-    """
-    Middleware that uses a DI container (from context.kwargs["injector"])
-    to inject parameters for the target function.
-
-    - If the target function does NOT declare 'injector' as a parameter,
-      we remove 'injector' from kwargs so Python won't complain about
-      "unexpected keyword argument 'injector'".
-    - We then do typed injection for any missing parameters that have type hints.
-    """
+def inject_dependency_middleware(context: Context, next: Next):
 
     func = context.func
     original_args = context.args
@@ -122,10 +151,15 @@ def inject_dependency_middleware(context: Context, next_: Callable[[], Any]) -> 
     # Grab the injector object if any (from container_builder_middleware)
     injector_obj = original_kwargs.get("injector", None)
 
-    # If the function does NOT declare 'injector', remove it from final kwargs
+    # If the function does NOT declare **kwargs, remove unrecognized keys
     # so that bind_partial won't complain about an extra param.
-    if "injector" not in param_names and "injector" in original_kwargs:
-        del original_kwargs["injector"]
+    has_var_keyword = any(
+        p.kind == inspect.Parameter.VAR_KEYWORD for p in sig.parameters.values()
+    )
+
+    if not has_var_keyword:
+        # Filter out all kwargs that are not in param_names
+        original_kwargs = {k: v for k, v in original_kwargs.items() if k in param_names}
 
     # Now bind partial with the safe set of kwargs
     bound_args = sig.bind_partial(*original_args, **original_kwargs)
@@ -151,35 +185,16 @@ def inject_dependency_middleware(context: Context, next_: Callable[[], Any]) -> 
 
     # Update context with the newly bound arguments
     context.args = bound_args.args
-    context.kwargs = bound_args.kwargs
+    # The right-side dict takes precedence, so existing context kwargs take precedence
+    context.kwargs = bound_args.kwargs | context.kwargs
 
-    return next_()
+    return next()
 
 
-def container_builder_middleware(context: Context, next_: Callable[[], Any]) -> Any:
+def container_builder_middleware(context: Context, next: Next):
     container = build_di_container()
     context.kwargs["injector"] = container
-    return next_()
-
-
-def pipeline_as_middleware(
-    sub_pipeline: Callable[[Callable[..., Any]], Callable[..., Any]]
-) -> Callable[[Context, Callable[[], Any]], Any]:
-    """
-    Converts an existing pipeline (a decorator) into a single (context, next_) middleware.
-    """
-
-    def sub_pipeline_mw(context: Context, next_: Callable[[], Any]) -> Any:
-        # 1) Make a dummy function that calls next_()
-        def dummy_func(*args, **kwargs):
-            return next_()
-
-        # 2) Decorate that dummy function with `sub_pipeline`
-        decorated = sub_pipeline(dummy_func)
-        # 3) Call the 'decorated' function with context.args, context.kwargs
-        return decorated(*context.args, **context.kwargs)
-
-    return sub_pipeline_mw
+    return next()
 
 
 __all__ = [
@@ -188,5 +203,6 @@ __all__ = [
     "typed_request_middleware",
     "inject_dependency_middleware",
     "container_builder_middleware",
-    "pipeline_as_middleware",
+    "TimeMiddleware",
+    "LogMiddleware",
 ]
