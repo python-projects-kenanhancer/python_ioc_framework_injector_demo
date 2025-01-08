@@ -1,6 +1,7 @@
+import functools
 from typing import Any, Callable
 
-from .context import Context
+from .pipeline import Context
 
 
 def compose_middlewares(
@@ -13,7 +14,6 @@ def compose_middlewares(
 
     def decorator(final_func: Callable[..., Any]) -> Callable[..., Any]:
         # We'll preserve metadata about the original function using `functools.wraps`
-        import functools
 
         @functools.wraps(final_func)
         def pipeline_call(*args: Any, **kwargs: Any) -> Any:

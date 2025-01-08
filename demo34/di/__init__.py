@@ -1,10 +1,9 @@
 from .build_di_container import build_di_container
 from .compose_middlewares import compose_middlewares
 from .config_module import ConfigModule
-from .context import Context
 from .greeting_module import GreetingModule
 from .middlewares import *
-from .pipeline import pipeline
+from .pipeline import Context, pipeline
 
 __all__ = [
     "compose_middlewares",

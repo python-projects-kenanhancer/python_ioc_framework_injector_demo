@@ -1,5 +1,6 @@
 import functools
 import inspect
+from dataclasses import dataclass
 from typing import (
     Any,
     Callable,
@@ -11,7 +12,14 @@ from typing import (
     runtime_checkable,
 )
 
-from .context import Context
+
+@dataclass
+class Context:
+    func: Callable[..., Any]
+    args: tuple
+    kwargs: dict
+    result = None
+
 
 T = TypeVar("T")
 R = TypeVar("R")

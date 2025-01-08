@@ -5,8 +5,7 @@ from flask import Request
 from injector import inject
 
 from .build_di_container import build_di_container
-from .context import Context
-from .pipeline import Next
+from .pipeline import Context, Next
 
 
 def logger_middleware(context: Context, next: Next):
