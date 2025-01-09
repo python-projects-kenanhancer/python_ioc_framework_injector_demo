@@ -1,7 +1,10 @@
 import time
 
-from di import (
+from flask import Flask, request
+from greeting import GreetingHttpRequest, GreetingService
+from infrastructure import (
     LogMiddleware,
+    SayHelloSettings,
     TimeMiddleware,
     container_builder_middleware,
     inject_dependency_middleware,
@@ -10,11 +13,14 @@ from di import (
     time_middleware,
     typed_request_middleware,
 )
-from flask import Flask, request
-from greeting import AppConfig, GreetingHttpRequest, GreetingService
 from injector import Injector
 
-shared_pipeline = pipeline(container_builder_middleware, LogMiddleware, TimeMiddleware)
+shared_pipeline = pipeline(
+    container_builder_middleware,
+    inject_dependency_middleware,
+    LogMiddleware,
+    TimeMiddleware,
+)
 
 
 @pipeline(shared_pipeline)
@@ -45,9 +51,9 @@ def say_hello_ultimate_http_v1(
     request: GreetingHttpRequest, greeting_service: GreetingService, injector: Injector
 ):
 
-    app_config = injector.get(AppConfig)
+    say_hello_settings = injector.get(SayHelloSettings)
 
-    print(app_config)
+    print(say_hello_settings)
 
     full_name = f"{request.first_name} {request.last_name}"
 
@@ -68,11 +74,11 @@ sub_pipeline = pipeline(logger_middleware, time_middleware)
 def say_hello_ultimate_http_v2(
     request: GreetingHttpRequest,
     greeting_service: GreetingService,
-    app_config: AppConfig,
+    say_hello_settings: SayHelloSettings,
     **kwargs,
 ):
 
-    print(app_config)
+    print(say_hello_settings)
 
     full_name = f"{request.first_name} {request.last_name}"
 
@@ -94,6 +100,9 @@ if __name__ == "__main__":
         say_hello_ultimate_http_v1(request)
         say_hello_ultimate_http_v2(request)
         print()
+
+    greeting_request = GreetingHttpRequest(first_name="John", last_name="Doe")
+    say_hello_ultimate_http_v1(request=greeting_request)
 
     print(add_numbers(3, 4))
 

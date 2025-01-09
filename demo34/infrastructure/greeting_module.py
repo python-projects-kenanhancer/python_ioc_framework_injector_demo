@@ -1,10 +1,11 @@
-from greeting import (
+from greeting.greeting_strategies import (
     BasicGreetingStrategy,
-    GreetingType,
     HolidayGreetingStrategy,
     TimeBasedGreetingStrategy,
 )
 from injector import Binder, Module, singleton
+
+from .models import GreetingType
 
 
 class GreetingModule(Module):
